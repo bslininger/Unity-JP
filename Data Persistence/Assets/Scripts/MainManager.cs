@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class MainManager : MonoBehaviour
 {
@@ -11,7 +14,12 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
-    public GameObject GameOverText;
+    public Text StartText;
+    public Text GameOverText;
+    public Button BackButton;
+    public Button QuitButton;
+    public Text NameText;
+    public Text HighScoreText;
     
     private bool m_Started = false;
     private int m_Points;
@@ -36,6 +44,12 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        NameText.text = DataManager.Instance.Name ?? "Player";
+        if (DataManager.Instance.HighScores?.Count > 0)
+        {
+            HighScoreText.text = $"High Score: {DataManager.Instance.HighScores[0].score.ToString()} ({DataManager.Instance.HighScores[0].name})";
+        }
     }
 
     private void Update()
@@ -51,6 +65,8 @@ public class MainManager : MonoBehaviour
 
                 Ball.transform.SetParent(null);
                 Ball.AddForce(forceDir * 2.0f, ForceMode.VelocityChange);
+
+                StartText.gameObject.SetActive(false);
             }
         }
         else if (m_GameOver)
@@ -71,6 +87,24 @@ public class MainManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
-        GameOverText.SetActive(true);
+        GameOverText.gameObject.SetActive(true);
+        BackButton.gameObject.SetActive(true);
+        QuitButton.gameObject.SetActive(true);
+        DataManager.Instance.AddScoreToHighScores(DataManager.Instance.Name, m_Points);
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    public void Quit()
+    {
+        DataManager.Instance.SaveHighScores();
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#else
+        Application.Quit();
+#endif
     }
 }
