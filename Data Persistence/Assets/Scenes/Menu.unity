@@ -1642,6 +1642,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameInput: {fileID: 86899771}
+  startButton: {fileID: 471227906}
   highScoreListNames: {fileID: 88817945}
   highScoreListScores: {fileID: 1418208997}
 --- !u!1 &1148452708
